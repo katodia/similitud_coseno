@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Titulaciones recomendados</title>
+    {%load static%}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/skeleton.css' %}">
+</head>
+<body class="container">
+<h2> Titulaciones recomendadas </h2>
+<div class="row">
+        <form name="relation" id="relation">
+            <select id="courses">
+                {% for course in courses %}
+                <option value="{{course.id}}">{{course.name}}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <div id="results">
+        </div>
+</div>
+<script>
+    let courses = document.querySelector('select#courses');
+    let results = document.querySelector('#results');
+    courses.onchange = function(){
+        let id = courses.selectedIndex;
+        get_data(courses[id].value);
+    }
+
+    async function get_data(id) {
+        fetch('api/relations/?format=json&course_id='+id,
+            {
+                method: "GET"
+            })
+            .then(function(res){ return res.json(); })
+           .then(function(data){
+                results.innerHTML = '';
+                for(let i=0; i<data.length; i++){
+                    let p = document.createElement("p");
+                    let text = document.createTextNode(data[i].related['name']);
+                    p.appendChild(text);
+                    results.append(p);
+                }
+            });
+    }
+</script>
+</body>
+</html>
